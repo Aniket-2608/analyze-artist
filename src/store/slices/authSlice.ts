@@ -13,12 +13,20 @@ interface AuthState {
   error: string | null;
 }
 
-const initialState: AuthState = {
-  user: null,
-  isAuthenticated: false,
-  loading: false,
-  error: null,
+// Initialize state from localStorage if available
+const getInitialState = (): AuthState => {
+  const savedUser = localStorage.getItem('user');
+  const savedAuth = localStorage.getItem('isAuthenticated');
+  
+  return {
+    user: savedUser ? JSON.parse(savedUser) : null,
+    isAuthenticated: savedAuth === 'true',
+    loading: false,
+    error: null,
+  };
 };
+
+const initialState: AuthState = getInitialState();
 
 const authSlice = createSlice({
   name: 'auth',
@@ -33,6 +41,10 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
       state.loading = false;
       state.error = null;
+      
+      // Save to localStorage
+      localStorage.setItem('user', JSON.stringify(action.payload));
+      localStorage.setItem('isAuthenticated', 'true');
     },
     loginFailure: (state, action: PayloadAction<string>) => {
       state.loading = false;
@@ -43,6 +55,10 @@ const authSlice = createSlice({
       state.user = null;
       state.isAuthenticated = false;
       state.error = null;
+      
+      // Remove from localStorage
+      localStorage.removeItem('user');
+      localStorage.removeItem('isAuthenticated');
     },
     registerStart: (state) => {
       state.loading = true;
@@ -53,6 +69,10 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
       state.loading = false;
       state.error = null;
+      
+      // Save to localStorage
+      localStorage.setItem('user', JSON.stringify(action.payload));
+      localStorage.setItem('isAuthenticated', 'true');
     },
     registerFailure: (state, action: PayloadAction<string>) => {
       state.loading = false;

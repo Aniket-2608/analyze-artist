@@ -11,6 +11,14 @@ import { Mail, Lock, LogIn } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { RootState } from '../store';
 
+// Define a mock users array for demo purposes
+// In a real app, you would check against a backend database
+const mockUsers = [
+  { email: 'admin@example.com', password: 'password123', name: 'Admin User' },
+  { email: 'user@example.com', password: 'password123', name: 'Regular User' },
+  { email: 'demo@example.com', password: 'demo123', name: 'Demo User' },
+];
+
 const Login: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -60,20 +68,25 @@ const Login: React.FC = () => {
     dispatch(loginStart());
 
     try {
-      // For demo purposes, we're accepting any credentials
-      // In a real app, you would validate against a backend
-      if (formData.email && formData.password) {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        dispatch(loginSuccess({ email: formData.email }));
+      // Simulate API delay for a more realistic experience
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Check if the user exists in our mock database
+      const user = mockUsers.find(
+        user => user.email === formData.email && user.password === formData.password
+      );
+      
+      if (user) {
+        // Login successful
+        dispatch(loginSuccess({ email: user.email, name: user.name }));
         toast({
           title: "Success",
           description: "Successfully logged in!",
         });
         navigate('/stores');
       } else {
-        dispatch(loginFailure("Invalid credentials"));
+        // Login failed
+        dispatch(loginFailure("Invalid email or password. Please try again."));
       }
     } catch (error) {
       dispatch(loginFailure("An error occurred during login."));

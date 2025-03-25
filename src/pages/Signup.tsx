@@ -11,6 +11,13 @@ import { Mail, Lock, User, UserPlus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { RootState } from '../store';
 
+// This would be imported from a shared file in a real app
+const mockUsers = [
+  { email: 'admin@example.com', password: 'password123', name: 'Admin User' },
+  { email: 'user@example.com', password: 'password123', name: 'Regular User' },
+  { email: 'demo@example.com', password: 'demo123', name: 'Demo User' },
+];
+
 const Signup: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -71,24 +78,36 @@ const Signup: React.FC = () => {
     dispatch(registerStart());
 
     try {
-      // For demo purposes, we're accepting any registration
-      // In a real app, you would register with a backend
-      if (formData.email && formData.password) {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        dispatch(registerSuccess({ 
-          email: formData.email,
-          name: formData.name
-        }));
-        toast({
-          title: "Success",
-          description: "Account created successfully!",
-        });
-        navigate('/stores');
-      } else {
-        dispatch(registerFailure("Registration failed. Please try again."));
+      // Check if the email is already registered
+      const emailExists = mockUsers.some(user => user.email === formData.email);
+      
+      if (emailExists) {
+        dispatch(registerFailure("Email already exists. Please use a different email."));
+        return;
       }
+
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // In a real app, you would send this data to your backend
+      // Here we're just adding to our mock users array for demo purposes
+      mockUsers.push({
+        email: formData.email,
+        password: formData.password,
+        name: formData.name
+      });
+      
+      dispatch(registerSuccess({ 
+        email: formData.email,
+        name: formData.name
+      }));
+      
+      toast({
+        title: "Success",
+        description: "Account created successfully!",
+      });
+      
+      navigate('/stores');
     } catch (error) {
       dispatch(registerFailure("An error occurred during registration."));
     }

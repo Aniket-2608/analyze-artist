@@ -25,7 +25,11 @@ const Navbar: React.FC = () => {
               key={item.path}
               to={item.path}
               className={({ isActive }) => 
-                `nav-item ${isActive ? 'active' : ''}`
+                `flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  isActive 
+                    ? 'bg-primary/10 text-primary' 
+                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                }`
               }
             >
               {item.icon}

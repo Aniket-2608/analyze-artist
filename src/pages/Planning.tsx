@@ -1,13 +1,12 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RootState } from '../store';
-import { setPlanningCellValue } from '../store/slices/planningSlice';
-import { SKU, Store, Week } from '../types/models';
 import { AgGridReact, AgGridColumn } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { setPlanningCellValue } from '../store/slices/planningSlice';
+import { SKU, Store, Week } from '../types/models';
 
 const Planning: React.FC = () => {
   const stores = useSelector((state: RootState) => state.stores.stores);
@@ -21,7 +20,7 @@ const Planning: React.FC = () => {
   ]);
 
   // Generate dynamic columns for weeks
-  useMemo(() => {
+  useEffect(() => {
     const weekColumns = weeks.map((week: Week) => ({
       field: week.id,
       headerName: week.id,
