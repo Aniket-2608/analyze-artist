@@ -2,6 +2,8 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Store, ShoppingBag, BarChart3, LineChart } from 'lucide-react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
 
 const navItems = [
   { path: '/stores', name: 'Stores', icon: <Store className="w-5 h-5" /> },
@@ -11,6 +13,12 @@ const navItems = [
 ];
 
 const Navbar: React.FC = () => {
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+
+  if (!isAuthenticated) {
+    return null;
+  }
+
   return (
     <aside className="w-64 h-full fixed left-0 top-0 bottom-0 glass-panel bg-white/60 border-r border-gray-200 py-6 px-4 overflow-y-auto animate-slide-right">
       <div className="flex flex-col h-full">
@@ -31,6 +39,7 @@ const Navbar: React.FC = () => {
                     : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                 }`
               }
+              end
             >
               {item.icon}
               <span>{item.name}</span>
