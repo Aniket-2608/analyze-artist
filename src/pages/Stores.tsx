@@ -1,14 +1,20 @@
 
 import React, { useState } from 'react';
-import { useData } from '../context/DataContext';
+import { useSelector, useDispatch } from 'react-redux';
 import { Store } from '../types/models';
 import { Plus, X, ChevronUp, ChevronDown, Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { addStore, updateStore, removeStore, reorderStore } from '../store/slices/storeSlice';
+import { RootState } from '../store';
+import { useToast } from '@/hooks/use-toast';
 
 const Stores: React.FC = () => {
-  const { stores, addStore, updateStore, removeStore, reorderStore } = useData();
+  const dispatch = useDispatch();
+  const { stores } = useSelector((state: RootState) => state.stores);
+  const { toast } = useToast();
+  
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   
@@ -29,7 +35,11 @@ const Stores: React.FC = () => {
     e.preventDefault();
     if (!formData.id || !formData.label || !formData.city || !formData.state) return;
     
-    addStore(formData);
+    dispatch(addStore(formData));
+    toast({
+      title: "Store Added",
+      description: `${formData.label} has been added successfully.`,
+    });
     setFormData({ id: '', label: '', city: '', state: '' });
     setIsAdding(false);
   };
@@ -41,7 +51,11 @@ const Stores: React.FC = () => {
     const store = stores.find(s => s.id === editingId);
     if (!store) return;
     
-    updateStore({ ...formData, seqNo: store.seqNo });
+    dispatch(updateStore({ ...formData, seqNo: store.seqNo }));
+    toast({
+      title: "Store Updated",
+      description: `${formData.label} has been updated successfully.`,
+    });
     setFormData({ id: '', label: '', city: '', state: '' });
     setEditingId(null);
   };
@@ -58,14 +72,22 @@ const Stores: React.FC = () => {
 
   const handleMoveUp = (index: number) => {
     if (index > 0) {
-      reorderStore(index, index - 1);
+      dispatch(reorderStore({ fromIndex: index, toIndex: index - 1 }));
     }
   };
 
   const handleMoveDown = (index: number) => {
     if (index < stores.length - 1) {
-      reorderStore(index, index + 1);
+      dispatch(reorderStore({ fromIndex: index, toIndex: index + 1 }));
     }
+  };
+
+  const handleRemoveStore = (id: string) => {
+    dispatch(removeStore(id));
+    toast({
+      title: "Store Removed",
+      description: "The store has been removed successfully.",
+    });
   };
 
   return (
@@ -271,7 +293,7 @@ const Stores: React.FC = () => {
                           size="sm" 
                           variant="ghost" 
                           className="text-red-500 hover:text-red-700"
-                          onClick={() => removeStore(store.id)}
+                          onClick={() => handleRemoveStore(store.id)}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
